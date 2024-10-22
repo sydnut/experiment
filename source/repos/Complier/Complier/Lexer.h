@@ -18,9 +18,10 @@ class Lexer {
 	}
 	bool getch(char c) {
 		getch();
-		if (peek == c) { 
+		if (peek == c) {
 			peek = ' ';
-			return 1; }
+			return 1;
+		}
 		else return 0;
 	}
 	int size;
@@ -31,49 +32,59 @@ class Lexer {
 public:
 	int len;
 	//void£¬main£¬if£¬then£¬break£¬int£¬Char£¬float£¬include£¬for£¬while£¬printf, scanf £¬begin,end,
-	Lexer(char*c,int sa) {
+	Lexer(char* c, int sa) {
 		hashmap.clear();
 		size = sa;
 		peek = ' ';
-		line = 0;
+		line = 1;
 		data = c;
 		len = 0;
+		printf("%2d", line);
 		reserve(Word("void", TAG::VOID)); reserve(Word("main", TAG::MAIN)); reserve(Word("if", TAG::IF)); reserve(Word("then", TAG::THEN)); reserve(Word("break", TAG::BREAK));
 		reserve(Word("int", TAG::INT)); reserve(Word("char", TAG::CHAR)); reserve(Word("float", TAG::FLOAT)); reserve(Word("include", TAG::INCLUDE)); reserve(Word("for", TAG::FOR));
 		reserve(Word("while", TAG::WHILE)); reserve(Word("printf", TAG::PRINTF)); reserve(Word("scanf", TAG::SCANF)); reserve(Word("begin", TAG::BEGIN)); reserve(Word("end", TAG::END));
 	}
 	void scan() {
-		for (;;getch()) {
-			if (peek == ' ' || peek == '\t') { continue; }
-			if (peek == '\n')line++;
-			if (len > size)break;
+		for (; len < size; getch()) {
+			if (peek == ' ' || peek == '\t') {
+				if (len > 1024)break;//×î´óÈÝÁ¿
+				continue;
+			}
+			if (peek == '\r'&&getch('\n'))printf("\n%2d ", ++line);
 			else break;
 		}
 		if (len > size)return;
 		switch (peek)
 		{
 		case'=':
-			if (getch('=')){Word("==", TAG::EQ).show(); return;
-		}
+			if (getch('=')) {
+				Word("==", TAG::EQ).show(); return;
+			}
 			else {
 				Word("=", TAG::BECOMES).show(); return;
 			}; break;
 		case'!':
-			if (getch('=')) { Word("!=", TAG::NE).show(); return;
+			if (getch('=')) {
+				Word("!=", TAG::NE).show(); return;
 			}
-			else {Word("!", TAG::SYMBOLS).show(); return;
+			else {
+				Word("!", TAG::SYMBOLS).show(); return;
 			} break;
 		case'>':
 		{
-			if (getch('=')){Word(">=", TAG::RQ).show(); return;
+			if (getch('=')) {
+				Word(">=", TAG::RQ).show(); return;
 			}
-			else {Word(">", TAG::RN).show(); return;
+			else {
+				Word(">", TAG::RN).show(); return;
 			} break;
 		}
 		case'<':
-			if (getch('=')) {Word("<=", TAG::LQ).show(); return;
+			if (getch('=')) {
+				Word("<=", TAG::LQ).show(); return;
 			}
-			else { Word("<", TAG::LN).show(); return;
+			else {
+				Word("<", TAG::LN).show(); return;
 			} break;
 		default:
 			break;
@@ -124,11 +135,12 @@ public:
 				}
 			}
 		}
-		 Word(peek).show();
-		 peek = ' ';
+		Word(peek).show();
+		peek = ' ';
 
-		 return;
+		return;
 	}
 };
 
 #endif
+

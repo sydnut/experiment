@@ -22,12 +22,13 @@ int main() {
         // 读取文件内容
         if (file.read(buffer, size)) {
             buffer[size] = '\0';
-            Lexer instance(buffer,size);
+            cout << "以下是文件原文:" << endl;
             for (int i = 0; i <= size; i++) {
                 cout << buffer[i];
             }
-            cout << endl;
-            for (;  instance.len<= size; ) {
+            cout<<endl <<"词法分析结果（不同类型之间用空格间隔，每行第一个是行号）：" << endl;
+            Lexer instance(buffer, size);
+            for (;  instance.len< size; ) {
                 instance.scan();
                 cout << ' ';
             }

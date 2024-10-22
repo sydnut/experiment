@@ -1,3 +1,10 @@
 
-while(1<=0){printf("1");}
-return 1.2;
+//test the program
+static int id=1;
+double test(){
+    while(id<=0){printf("1");}
+        return 1.2;
+}
+int main(){
+    test();
+}
