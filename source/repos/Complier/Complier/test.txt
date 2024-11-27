@@ -1,10 +1,12 @@
-
-//test the program
-static int id=1;
-double test(){
-    while(id<=0){printf("1");}
-        return 1.2;
-}
-int main(){
-    test();
-}
+const kd=2,c=7;
+int james,vari;
+procedure fun;
+    int a;
+    a=0;
+    while a<2 do a=a+1$
+begin
+while 1<2 do
+if a<1 then vari=3+5*4;
+a=a+1
+end
+.

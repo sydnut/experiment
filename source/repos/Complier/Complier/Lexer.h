@@ -8,13 +8,12 @@
 using namespace std;
 class Lexer {
 
-	void reserve(Word word) {
-		hashmap[word.s] = word;
+	void reserve(Word&& word) {
+		hashmap.insert(make_pair(word.s, word));
 	}
 	void getch() {
 		if (len < size)
 			peek = data[len++];
-		else peek = ' ';
 	}
 	bool getch(char c) {
 		getch();
@@ -39,52 +38,53 @@ public:
 		line = 1;
 		data = c;
 		len = 0;
-		printf("%2d", line);
-		reserve(Word("void", TAG::VOID)); reserve(Word("main", TAG::MAIN)); reserve(Word("if", TAG::IF)); reserve(Word("then", TAG::THEN)); reserve(Word("break", TAG::BREAK));
-		reserve(Word("int", TAG::INT)); reserve(Word("char", TAG::CHAR)); reserve(Word("float", TAG::FLOAT)); reserve(Word("include", TAG::INCLUDE)); reserve(Word("for", TAG::FOR));
-		reserve(Word("while", TAG::WHILE)); reserve(Word("printf", TAG::PRINTF)); reserve(Word("scanf", TAG::SCANF)); reserve(Word("begin", TAG::BEGIN)); reserve(Word("end", TAG::END));
+		//printf("%2d", line);
+		  reserve(Word("if", TAG::IF)); reserve(Word("then", TAG::THEN)); reserve(Word("break", TAG::BREAK)); reserve(Word("procedure", TAG::PROCEDURE));
+		reserve(Word("int", TAG::INT)); reserve(Word("char", TAG::CHAR)); reserve(Word("float", TAG::FLOAT)); reserve(Word("for", TAG::FOR));
+		reserve(Word("while", TAG::WHILE)); reserve(Word("begin", TAG::BEGIN)); reserve(Word("end", TAG::END)); reserve(Word("call", TAG::CALL));
+		reserve(Word("const", TAG::CONST)); reserve(Word("do", TAG::DO));
 	}
-	void scan() {
+	Token* scan() {
 		for (; len < size; getch()) {
 			if (peek == ' ' || peek == '\t') {
 				if (len > 1024)break;//×î´óÈÝÁ¿
 				continue;
 			}
-			if (peek == '\r'&&getch('\n'))printf("\n%2d ", ++line);
+			if ((peek == '\r' && getch('\n'))||peek=='\n') {//printf("\n%2d ", ++line);
+			}
 			else break;
 		}
-		if (len > size)return;
 		switch (peek)
 		{
 		case'=':
 			if (getch('=')) {
-				Word("==", TAG::EQ).show(); return;
+				return new Word("==", TAG::EQ);
 			}
 			else {
-				Word("=", TAG::BECOMES).show(); return;
+				return new Word("=", TAG::BECOMES); 
 			}; break;
 		case'!':
 			if (getch('=')) {
-				Word("!=", TAG::NE).show(); return;
+				return new Word("!=", TAG::NE); 
 			}
 			else {
-				Word("!", TAG::SYMBOLS).show(); return;
+				return new Word("!", TAG::SYMBOLS); 
 			} break;
 		case'>':
 		{
 			if (getch('=')) {
-				Word(">=", TAG::RQ).show(); return;
+				return new Word(">=", TAG::RQ); 
 			}
 			else {
-				Word(">", TAG::RN).show(); return;
+				return new Word(">", TAG::RN); 
 			} break;
 		}
 		case'<':
 			if (getch('=')) {
-				Word("<=", TAG::LQ).show(); return;
+				return new Word("<=", TAG::LQ);
 			}
 			else {
-				Word("<", TAG::LN).show(); return;
+				return new Word("<", TAG::LN); 
 			} break;
 		default:
 			break;
@@ -95,7 +95,7 @@ public:
 				sum += sum * 10 + peek - '0';
 				getch();
 			} while (isdigit(peek));
-			if (peek != '.') { Num(sum).show(); return; }
+			if (peek != '.') { return new Num(sum);  }
 			else {
 				getch();
 				int d = 10;
@@ -105,42 +105,26 @@ public:
 					d *= 10;
 					getch();
 				} while (isdigit(peek));
-				Real(real).show();
-				return;
+				return new Real(real);
+				
 			}
 		}
-		if ((peek <= 'z' && peek >= 'a') || (peek <= 'Z' && peek >= 'A') || peek == '_') {
+		if (isalpha(peek)|| peek == '_') {
 			string s;
 			do {
 				s.push_back(peek);
 				getch();
-			} while ((peek <= 'z' && peek >= 'a') || (peek <= 'Z' && peek >= 'A') || peek == '_' || isdigit(peek));
-			if (hashmap.find(s) == hashmap.end()) { hashmap[s] = Word(s, TAG::IDENTIFIER); }hashmap[s].show(); return;
+			} while (isalpha(peek) || peek == '_' || isdigit(peek));
+			if (hashmap.find(s) == hashmap.end()) { reserve(Word(s, TAG::IDENTIFIER)); }return new Word(s,hashmap.find(s)->second.getTAG()) ;
 		}
-		if (peek == '-') {
-			if (isdigit(peek)) {
-				int sum = 0;
-				do {
-					sum += sum * 10 + peek - '0';
-					getch();
-				} while (isdigit(peek));
-				if (peek != '.') { Num(sum * -1).show(); return; }
-				else {
-					double real = sum;
-					do {
-						real = (real * 10 + peek - '0') / 10.0;
-						getch();
-					} while (isdigit(peek));
-					Real(real * -1).show(); return;
-				}
-			}
-		}
-		Word(peek).show();
-		peek = ' ';
+		if (peek == '.')return new Word(".", TAG::ENDSIGN);
+		char t = peek; peek = ' ';
+		return new Word(t);
+		
+		
 
-		return;
+
 	}
 };
 
 #endif
-

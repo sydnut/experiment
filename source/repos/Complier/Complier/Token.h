@@ -9,6 +9,9 @@ public:
 	int tag;
 	void virtual show() { cout << 1; };
 	Token(const int num) { tag = num; }
+	int getTAG() {
+		return tag;
+	}
 };
 class Num :public Token {
 public:
@@ -22,7 +25,7 @@ public:
 };
 class Real :public Token {
 public:
-double num;
+	double num;
 	Real(const double n) :Token(TAG::REAL) { num = n; }
 	void show()override {
 		cout << num;
@@ -31,16 +34,20 @@ double num;
 class Word :public Token {
 public:
 	string s;
-	Word(const string&str, int n) :Token(n) {
+	char c;
+	Word(const string& str, int n) :Token(n) {
 		s = str;
 	}
-	Word() :Token(-1) { s = ""; }
+	
 	Word(char c) :Token(TAG::SYMBOLS) {
-		s.push_back(c);
+		this->c = c;
 	}
-	void show() override{
-		cout << s;
+	void show() override {
+		if (tag != TAG::SYMBOLS)cout << s;
+		else cout << c;
+	}
+	char getch() {
+		return c;
 	}
 };
 #endif // !_TOKEN_H_
-
